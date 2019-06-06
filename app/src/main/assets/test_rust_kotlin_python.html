@@ -1,0 +1,222 @@
+<html>
+  <head>
+    <title>
+    </title>
+    <script src="codeutils.js" type="text/javascript">
+    </script>
+    <link href="prettify-dark.css" rel="stylesheet" type="text/css"/>
+    <script src="prettify.js" type="text/javascript">
+    </script>
+    <script src="lang-Splus.js" type="text/javascript">
+    </script>
+    <script src="lang-aea.js" type="text/javascript">
+    </script>
+    <script src="lang-agc.js" type="text/javascript">
+    </script>
+    <script src="lang-apollo.js" type="text/javascript">
+    </script>
+    <script src="lang-basic.js" type="text/javascript">
+    </script>
+    <script src="lang-cbm.js" type="text/javascript">
+    </script>
+    <script src="lang-cl.js" type="text/javascript">
+    </script>
+    <script src="lang-clj.js" type="text/javascript">
+    </script>
+    <script src="lang-css.js" type="text/javascript">
+    </script>
+    <script src="lang-dart.js" type="text/javascript">
+    </script>
+    <script src="lang-el.js" type="text/javascript">
+    </script>
+    <script src="lang-erl.js" type="text/javascript">
+    </script>
+    <script src="lang-erlang.js" type="text/javascript">
+    </script>
+    <script src="lang-ex.js" type="text/javascript">
+    </script>
+    <script src="lang-exs.js" type="text/javascript">
+    </script>
+    <script src="lang-fs.js" type="text/javascript">
+    </script>
+    <script src="lang-go.js" type="text/javascript">
+    </script>
+    <script src="lang-hs.js" type="text/javascript">
+    </script>
+    <script src="lang-kotlin.js" type="text/javascript">
+    </script>
+    <script src="lang-lasso.js" type="text/javascript">
+    </script>
+    <script src="lang-lassoscript.js" type="text/javascript">
+    </script>
+    <script src="lang-latex.js" type="text/javascript">
+    </script>
+    <script src="lang-lgt.js" type="text/javascript">
+    </script>
+    <script src="lang-lisp.js" type="text/javascript">
+    </script>
+    <script src="lang-ll.js" type="text/javascript">
+    </script>
+    <script src="lang-llvm.js" type="text/javascript">
+    </script>
+    <script src="lang-logtalk.js" type="text/javascript">
+    </script>
+    <script src="lang-ls.js" type="text/javascript">
+    </script>
+    <script src="lang-lsp.js" type="text/javascript">
+    </script>
+    <script src="lang-lua.js" type="text/javascript">
+    </script>
+    <script src="lang-matlab.js" type="text/javascript">
+    </script>
+    <script src="lang-ml.js" type="text/javascript">
+    </script>
+    <script src="lang-mumps.js" type="text/javascript">
+    </script>
+    <script src="lang-n.js" type="text/javascript">
+    </script>
+    <script src="lang-nemerle.js" type="text/javascript">
+    </script>
+    <script src="lang-pascal.js" type="text/javascript">
+    </script>
+    <script src="lang-proto.js" type="text/javascript">
+    </script>
+    <script src="lang-r.js" type="text/javascript">
+    </script>
+    <script src="lang-rd.js" type="text/javascript">
+    </script>
+    <script src="lang-rkt.js" type="text/javascript">
+    </script>
+    <script src="lang-rust.js" type="text/javascript">
+    </script>
+    <script src="lang-s.js" type="text/javascript">
+    </script>
+    <script src="lang-scala.js" type="text/javascript">
+    </script>
+    <script src="lang-scm.js" type="text/javascript">
+    </script>
+    <script src="lang-sql.js" type="text/javascript">
+    </script>
+    <script src="lang-ss.js" type="text/javascript">
+    </script>
+    <script src="lang-swift.js" type="text/javascript">
+    </script>
+    <script src="file:///andro
+id_asset/lang-tcl.js" type="text/javascript">
+    </script>
+    <script src="lang-tex.js" type="text/javascript">
+    </script>
+    <script src="lang-vb.js" type="text/javascript">
+    </script>
+    <script src="lang-vbs.js" type="text/javascript">
+    </script>
+    <script src="lang-vhd.js" type="text/javascript">
+    </script>
+    <script src="lang-vhdl.js" type="text/javascript">
+    </script>
+    <script src="lang-wiki.js" type="text/javascript">
+    </script>
+    <script src="lang-xq.js" type="text/javascript">
+    </script>
+    <script src="lang-xquery.js" type="text/javascript">
+    </script>
+    <script src="lang-yaml.js" type="text/javascript">
+    </script>
+    <script src="lang-yml.js" type="text/javascript">
+    </script>
+  </head>
+  <body onload="prettyPrint(function() { highlightLines(-1,-1); addClickListeners(); NativeClient.onRenderingDone(); })" onresize="scrollToHighlight();">
+<pre class="prettyprint linenums lang-ktl" id="content"># -*- coding: utf-8 -*-
+package com.beust.kash
+
+import org.assertj.core.api.Assertions.assertThat
+import org.jline.terminal.TerminalBuilder
+import org.testng.annotations.DataProvider
+import org.testng.annotations.Test
+
+@Test
+class ShellTest {
+    private val shell = Shell(TerminalBuilder.builder().build())
+    private val Shell.CommandResult.out get() = this.stdout?.replace("\r", "")
+
+    @DataProvider
+    fun simpleDp() = arrayOf(
+            arrayOf("echo src", "src\n"),
+            arrayOf("ls `echo src`", "main\ntest\n")
+    )
+
+    @Test(dataProvider = "simpleDp")
+    fun simple(line: String, expected: String) {
+        val result = shell.runLine(line, false)
+        assertThat(result.out).isEqualTo(expected)
+    }
+
+    fun pipe() {
+        val result = shell.runLine("echo a\nb\nc | wc", false)
+        assertThat(result.stdout).startsWith("       1       3       6")
+    }
+
+    fun env() {
+        val result = shell.runLine("echo \$A", false)
+        assertThat(result.stdout).isNull()
+        shell.runLine("A=B", false)
+        val result2 = shell.runLine("echo \$A", false)
+        assertThat(result2.out).isEqualTo("B\n")
+    }
+}
+
+</pre>
+<pre class="prettyprint linenums lang-rs" id="content"># -*- coding: utf-8 -*-
+struct Foo<'a> {
+    x: &'a i32,
+}
+
+impl<'a> Foo<'a> {
+    fn x(&self) -> &'a i32 { self.x }
+}
+
+fn main() {
+    let y = &5; // this is the same as `let _y = 5; let y = &_y;`
+    let f = Foo { x: y };
+
+    println!("x is: {}", f.x());
+}
+
+</pre>
+    <pre class="prettyprint linenums lang-py" id="content"># -*- coding: utf-8 -*-
+
+"""
+parse
+----------------------------------
+
+High-level helper functions for the package
+"""
+
+from modparc.syntax.stored_definition import stored_definition
+from modparc.syntax import tokenize
+
+
+def parse(source_code):
+"""
+Parse Modelica source code and return the parsed structure
+
+:param source_code: code lines to be parsed
+:return: an instance of StoredDefinition
+"""
+tokens = tokenize(source_code)
+return stored_definition.parse(tokens)
+
+def parse_file(source_file):
+"""
+Parse Modelica source file and return the parsed structure
+
+:param source_file: Modelica source code file
+:return: an instance of StoredDefinition
+"""
+with open(source_file, 'r') as file_object:
+mo_file_content = file_object.read()
+return parse(mo_file_content)
+
+</pre>
+  </body>
+</html>
